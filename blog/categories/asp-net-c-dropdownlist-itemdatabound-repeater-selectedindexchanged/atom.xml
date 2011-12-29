@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ASP.NET,C#,DropDownList,ItemDataBound,Repeater,SelectedIndexChanged | Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/blog/categories/asp-net-c-dropdownlist-itemdatabound-repeater-selectedindexchanged/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2011-12-29T04:41:09+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/"/>
+    <updated>2011-11-28T18:56:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater</id>
+    <content type="html"><![CDATA[<p>When there is a Dropdownlist inside a repeater the dropdownlist will not throw the SelectedIndexChanged event even when the AutoPostback property is set to true. To get this event to throw I had to bind the dropdownlist on the ItemDataBound event of the repeater and set the event handler for the SelectedIndexChanged event, as seen below:</p>
+
+<p>``` c#
+protected void rptrCandidates_ItemDataBound(object sender, RepeaterItemEventArgs e)
+{</p>
+
+<pre><code> if ((e.Item.ItemType == ListItemType.Item) || (e.Item.ItemType == ListItemType.AlternatingItem))
+ {
+     DropDownList actions = e.Item.FindControl("actionsDDL") as DropDownList;
+     if ((actions != null))
+     {
+           ListItemCollection _items = new ListItemCollection();
+           foreach (string s in options)
+           {
+                _items.Add(new ListItem(s, row.ProjectCandidateId.ToString()));
+           }
+           actions.SelectedIndexChanged += new EventHandler(actionsDDL_SelectedIndexChanged);
+           actions.DataSource = _items;
+           actions.DataBind();
+      }
+ }
+</code></pre>
+
+<p>}
+```</p>
+
+<p>However, when the dropdownlist is bound the DataTextField and DataValueField are both filled with the Text value, and when I try to explicity set these, the SelectedIndexChanged event is not thrown. To get around this bizarre feature what I had to do was, next to the dropdownlist, put a hiddenfield that got bound to it the correct value that was supposed to be in the Value field of the list items (all were to have the same value):</p>
+
+<p>``` html
+<ItemTemplate></p>
+
+<pre><code>&lt;asp:HiddenField ID="projectCandidateHF" runat="server" Value='&lt;%# Eval("ProjectCandidateId") %&gt;' /&gt;
+&lt;asp:DropDownList ID="actionsDDL" runat="server" AutoPostBack="true" SelectedIndexChanged="actionsDDL_SelectedIndexChanged"&gt; 
+&lt;/asp:DropDownList&gt;
+</code></pre>
+
+<p></ItemTemplate>
+```</p>
+
+<p>Then on the SelectedIndexChanged event that the dropdownlist throws use the sender to get the DropDownList that threw the event and then use the Parent property to get the RepeaterItem in which it lives, then find the HiddenField using FindControl method:</p>
+
+<p>``` c#
+protected void actionsDDL_SelectedIndexChanged(object sender, EventArgs e)
+{</p>
+
+<pre><code>DropDownList actionsDDL = sender as DropDownList;
+HiddenField projectCandidateIdHF = actionsDDL.Parent.FindControl("projectCandidateHF") as HiddenField;
+//do fun stuff here
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

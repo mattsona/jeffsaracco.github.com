@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ASP.NET-MVC | Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/blog/categories/asp-net-mvc/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2011-12-29T04:41:09+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP MVC OnActionExecuting redirect without executing action]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/"/>
+    <updated>2011-11-28T18:54:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action</id>
+    <content type="html"><![CDATA[<p>I had a bug where an exception was being thrown for a null object in an action, so I decided to make an ActionFilter to check that the user had the right role and if not, redirect to default.aspx (which, it turns out, redirects to the correct dashboard, super bonus!). It worked, however the action was still being executed and throwing the error before the redirect happened.</p>
+
+<p>The fix for this, to stop execution of the action is set the result of the filterContext object like so:
+``` c#
+public class RequiresFirmRoleAttribute : ActionFilterAttribute
+{</p>
+
+<pre><code> public override void OnActionExecuting(ActionExecutingContext filterContext)
+ {
+    if (!((BaseFirmController)filterContext.Controller).IsFirmAdmin)
+    {
+        filterContext.Result = new RedirectResult("/Default.aspx");
+    }
+ }
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Dropping Partial MVC Views on Old School WebForms Pages]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/"/>
+    <updated>2011-11-28T18:47:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages</id>
+    <content type="html"><![CDATA[<p>Original Source <a href="http://stackoverflow.com/questions/702746/how-to-include-a-partial-view-inside-a-webform">here</a> with some changes due to difference in versions referenced.</p>
+
+<p>I was refactoring some pages and needed to drop an MVC partial view on one of our WebForms (aspx) pages. However, this functionality does not exist natively so I had to get creative.
+This solution, in my opinion, was best for now because it was easier than creating two of the same control, one for MVC and one for WebForms. It was also easier than refactoring all of the WebForms pages to be MVC just so that they could use this one control (however, they will probably be upgraded at some point in the future).</p>
+
+<p>Without further ado, here is the solution (if you didn.t already click the link at the top):</p>
+
+<p>Create a blank WebFormController class and a WebFormMVCUtil class which will grab the view, bind the model to it and write it to the screen. The code (located in public/Controllers/WebFormController.cs) is below:</p>
+
+<p>``` c#
+public class WebFormController : Controller { }</p>
+
+<pre><code>public static class WebFormMVCUtil
+{
+
+    public static void RenderPartial(string partialName, string controller, object model)
+    {
+        //get a wrapper for the legacy WebForm context
+        var httpCtx = new HttpContextWrapper(HttpContext.Current);
+
+        //create a mock route that points to the empty controller
+        var rt = new RouteData();
+        rt.Values.Add("controller", controller);
+
+         //create a controller context for the route and http context
+        var ctx = new ControllerContext(new RequestContext(httpCtx, rt), new WebFormController());
+
+         //find the partial view using the viewengine
+        var view = ViewEngines.Engines.FindPartialView(ctx, partialName).View;
+
+         //create a view context and assign the model
+        var vctx = new ViewContext(ctx, view,
+            new ViewDataDictionary { Model = model },
+            new TempDataDictionary(), HttpContext.Current.Response.Output);
+
+        //render the partial view
+        view.Render(vctx, HttpContext.Current.Response.Output);
+    }
+}
+</code></pre>
+
+<p>}
+```
+If you don.t care how it is implemented and just want to know how to stick an MVC partial view on your WebForms page just add the line below (substituting your own controller and view names in)</p>
+
+<p><code>
+&lt;% WebFormMVCUtil.RenderPartial("ViewName", "ControllerName", model); %&gt;
+</code></p>
+
+<p>Also, depending on your view, you need to pass it the model; but, as I did here, you can place a method in there that will get the model for you.</p>
+]]></content>
+  </entry>
+  
+</feed>

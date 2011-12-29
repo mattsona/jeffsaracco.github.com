@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OnActionExecuting | Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/blog/categories/onactionexecuting/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2011-12-29T04:41:09+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP MVC OnActionExecuting redirect without executing action]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/"/>
+    <updated>2011-11-28T18:54:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action</id>
+    <content type="html"><![CDATA[<p>I had a bug where an exception was being thrown for a null object in an action, so I decided to make an ActionFilter to check that the user had the right role and if not, redirect to default.aspx (which, it turns out, redirects to the correct dashboard, super bonus!). It worked, however the action was still being executed and throwing the error before the redirect happened.</p>
+
+<p>The fix for this, to stop execution of the action is set the result of the filterContext object like so:
+``` c#
+public class RequiresFirmRoleAttribute : ActionFilterAttribute
+{</p>
+
+<pre><code> public override void OnActionExecuting(ActionExecutingContext filterContext)
+ {
+    if (!((BaseFirmController)filterContext.Controller).IsFirmAdmin)
+    {
+        filterContext.Result = new RedirectResult("/Default.aspx");
+    }
+ }
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Dropping Partial MVC Views on Old School WebForms Pages - Jeff Saracco</title>
+  <meta name="author" content="Jeff Saracco">
+
+  
+  <meta name="description" content="Original Source here with some changes due to difference in versions referenced. I was refactoring some pages and needed to drop an MVC partial view &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jeff Saracco" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17462061-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jeff Saracco</a></h1>
+  
+    <h2>random thoughts, ideas, ramblings.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeffsaracco.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Dropping Partial MVC Views on Old School WebForms Pages</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T18:47:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Original Source <a href="http://stackoverflow.com/questions/702746/how-to-include-a-partial-view-inside-a-webform">here</a> with some changes due to difference in versions referenced.</p>
+
+<p>I was refactoring some pages and needed to drop an MVC partial view on one of our WebForms (aspx) pages. However, this functionality does not exist natively so I had to get creative.
+This solution, in my opinion, was best for now because it was easier than creating two of the same control, one for MVC and one for WebForms. It was also easier than refactoring all of the WebForms pages to be MVC just so that they could use this one control (however, they will probably be upgraded at some point in the future).</p>
+
+<p>Without further ado, here is the solution (if you didn.t already click the link at the top):</p>
+
+<p>Create a blank WebFormController class and a WebFormMVCUtil class which will grab the view, bind the model to it and write it to the screen. The code (located in public/Controllers/WebFormController.cs) is below:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="k">public</span> <span class="k">class</span> <span class="nc">WebFormController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">WebFormMVCUtil</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RenderPartial</span><span class="p">(</span><span class="kt">string</span> <span class="n">partialName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">controller</span><span class="p">,</span> <span class="kt">object</span> <span class="n">model</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//get a wrapper for the legacy WebForm context</span>
+</span><span class='line'>            <span class="n">var</span> <span class="n">httpCtx</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpContextWrapper</span><span class="p">(</span><span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//create a mock route that points to the empty controller</span>
+</span><span class='line'>            <span class="n">var</span> <span class="n">rt</span> <span class="p">=</span> <span class="k">new</span> <span class="n">RouteData</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">rt</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="s">&quot;controller&quot;</span><span class="p">,</span> <span class="n">controller</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>             <span class="c1">//create a controller context for the route and http context</span>
+</span><span class='line'>            <span class="n">var</span> <span class="n">ctx</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ControllerContext</span><span class="p">(</span><span class="k">new</span> <span class="n">RequestContext</span><span class="p">(</span><span class="n">httpCtx</span><span class="p">,</span> <span class="n">rt</span><span class="p">),</span> <span class="k">new</span> <span class="n">WebFormController</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'>             <span class="c1">//find the partial view using the viewengine</span>
+</span><span class='line'>            <span class="n">var</span> <span class="n">view</span> <span class="p">=</span> <span class="n">ViewEngines</span><span class="p">.</span><span class="n">Engines</span><span class="p">.</span><span class="n">FindPartialView</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">partialName</span><span class="p">).</span><span class="n">View</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>             <span class="c1">//create a view context and assign the model</span>
+</span><span class='line'>            <span class="n">var</span> <span class="n">vctx</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ViewContext</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span>
+</span><span class='line'>                <span class="k">new</span> <span class="n">ViewDataDictionary</span> <span class="p">{</span> <span class="n">Model</span> <span class="p">=</span> <span class="n">model</span> <span class="p">},</span>
+</span><span class='line'>                <span class="k">new</span> <span class="nf">TempDataDictionary</span><span class="p">(),</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Output</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//render the partial view</span>
+</span><span class='line'>            <span class="n">view</span><span class="p">.</span><span class="n">Render</span><span class="p">(</span><span class="n">vctx</span><span class="p">,</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Output</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you don.t care how it is implemented and just want to know how to stick an MVC partial view on your WebForms page just add the line below (substituting your own controller and view names in)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="p">&lt;%</span> <span class="n">WebFormMVCUtil</span><span class="p">.</span><span class="n">RenderPartial</span><span class="p">(</span><span class="s">&quot;ViewName&quot;</span><span class="p">,</span> <span class="s">&quot;ControllerName&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">);</span> <span class="p">%&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Also, depending on your view, you need to pass it the model; but, as I did here, you can place a method in there that will get the model for you.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jeff Saracco</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T18:47:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/asp-net-mvc/'>ASP.NET-MVC</a>, <a class='category' href='/blog/categories/c-/'>C#</a>, <a class='category' href='/blog/categories/webforms/'>WebForms</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/" data-via="jsaracco" data-counturl="http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/" title="Previous Post: ASP MVC - Fix for IE caching everything">&laquo; ASP MVC - Fix for IE caching everything</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/" title="next Post: ASP MVC OnActionExecuting redirect without executing action">ASP MVC OnActionExecuting redirect without executing action &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/">ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/">ASP MVC OnActionExecuting redirect without executing action</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/">Dropping Partial MVC Views on Old School WebForms Pages</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/">ASP MVC - Fix for IE caching everything</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/first-post-on-octopress/">First Post On Octopress</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <iframe src="http://githubbadge.appspot.com/badge/jeffsaracco" style="border: 0;height: 150px;width: 200px;overflow: hidden;"></iframe>
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeffsaracco',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jsaracco", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jsaracco" class="twitter-follow-button" data-width="208px" data-show-count="false">Follow @jsaracco</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/105546041830906548240?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Jeff Saracco -
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jeffsaracco';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/';
+        var disqus_url = 'http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

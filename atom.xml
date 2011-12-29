@@ -1,110 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Jeff Saracco</title>
-  <meta name="author" content="Jeff Saracco">
-
-  
-  <meta name="description" content="When there is a Dropdownlist inside a repeater the dropdownlist will not throw the SelectedIndexChanged event even when the AutoPostback property is &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://jeffsaracco.github.com">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Jeff Saracco" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-17462061-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Jeff Saracco</a></h1>
-  
-    <h2>random thoughts, ideas, ramblings.</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:jeffsaracco.github.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/about">About</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2011-12-29T04:41:09+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/">ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList Inside a Repeater</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-
-
-<time datetime="2011-11-28T18:56:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>When there is a Dropdownlist inside a repeater the dropdownlist will not throw the SelectedIndexChanged event even when the AutoPostback property is set to true. To get this event to throw I had to bind the dropdownlist on the ItemDataBound event of the repeater and set the event handler for the SelectedIndexChanged event, as seen below:</p>
+  <entry>
+    <title type="html"><![CDATA[ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/"/>
+    <updated>2011-11-28T18:56:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater</id>
+    <content type="html"><![CDATA[<p>When there is a Dropdownlist inside a repeater the dropdownlist will not throw the SelectedIndexChanged event even when the AutoPostback property is set to true. To get this event to throw I had to bind the dropdownlist on the ItemDataBound event of the repeater and set the event handler for the SelectedIndexChanged event, as seen below:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -176,42 +90,15 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/">ASP MVC OnActionExecuting Redirect Without Executing Action</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-28T18:54:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I had a bug where an exception was being thrown for a null object in an action, so I decided to make an ActionFilter to check that the user had the right role and if not, redirect to default.aspx (which, it turns out, redirects to the correct dashboard, super bonus!). It worked, however the action was still being executed and throwing the error before the redirect happened.</p>
+  <entry>
+    <title type="html"><![CDATA[ASP MVC OnActionExecuting redirect without executing action]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/"/>
+    <updated>2011-11-28T18:54:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action</id>
+    <content type="html"><![CDATA[<p>I had a bug where an exception was being thrown for a null object in an action, so I decided to make an ActionFilter to check that the user had the right role and if not, redirect to default.aspx (which, it turns out, redirects to the correct dashboard, super bonus!). It worked, however the action was still being executed and throwing the error before the redirect happened.</p>
 
 <p>The fix for this, to stop execution of the action is set the result of the filterContext object like so:</p>
 
@@ -237,42 +124,15 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/">Dropping Partial MVC Views on Old School WebForms Pages</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-28T18:47:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Original Source <a href="http://stackoverflow.com/questions/702746/how-to-include-a-partial-view-inside-a-webform">here</a> with some changes due to difference in versions referenced.</p>
+  <entry>
+    <title type="html"><![CDATA[Dropping Partial MVC Views on Old School WebForms Pages]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/"/>
+    <updated>2011-11-28T18:47:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages</id>
+    <content type="html"><![CDATA[<p>Original Source <a href="http://stackoverflow.com/questions/702746/how-to-include-a-partial-view-inside-a-webform">here</a> with some changes due to difference in versions referenced.</p>
 
 <p>I was refactoring some pages and needed to drop an MVC partial view on one of our WebForms (aspx) pages. However, this functionality does not exist natively so I had to get creative.
 This solution, in my opinion, was best for now because it was easier than creating two of the same control, one for MVC and one for WebForms. It was also easier than refactoring all of the WebForms pages to be MVC just so that they could use this one control (however, they will probably be upgraded at some point in the future).</p>
@@ -352,42 +212,15 @@ This solution, in my opinion, was best for now because it was easier than creati
 
 
 <p>Also, depending on your view, you need to pass it the model; but, as I did here, you can place a method in there that will get the model for you.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/">ASP MVC - Fix for IE Caching Everything</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-28T18:34:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>So it turns out that IE aggressively caches every AJAX GET response, which makes for some interesting and hard to fix bugs since we moved a lot of functionality to AJAX calls with MVC.</p>
+  <entry>
+    <title type="html"><![CDATA[ASP MVC - Fix for IE caching everything]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/"/>
+    <updated>2011-11-28T18:34:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything</id>
+    <content type="html"><![CDATA[<p>So it turns out that IE aggressively caches every AJAX GET response, which makes for some interesting and hard to fix bugs since we moved a lot of functionality to AJAX calls with MVC.</p>
 
 <p>Fear not, I have found a solution for this. The solution is to put a custom attribute on your MVC GET action if it is being called through AJAX.
 For Instance, the GET method for getting a list may look like this:</p>
@@ -448,193 +281,16 @@ Full class below</p>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-</div>
+]]></content>
+  </entry>
   
+  <entry>
+    <title type="html"><![CDATA[First Post On Octopress]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/first-post-on-octopress/"/>
+    <updated>2011-11-28T18:02:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/first-post-on-octopress</id>
+    <content type="html"><![CDATA[<p>This is my first post using <a href="http://http://octopress.org">Octopress</a>, and so far it seems to be going well.</p>
+]]></content>
+  </entry>
   
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/28/first-post-on-octopress/">First Post on Octopress</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-28T18:02:00+00:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is my first post using <a href="http://http://octopress.org">Octopress</a>, and so far it seems to be going well.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/">ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/">ASP MVC OnActionExecuting redirect without executing action</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/">Dropping Partial MVC Views on Old School WebForms Pages</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/">ASP MVC - Fix for IE caching everything</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/28/first-post-on-octopress/">First Post On Octopress</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>Github Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  <iframe src="http://githubbadge.appspot.com/badge/jeffsaracco" style="border: 0;height: 150px;width: 200px;overflow: hidden;"></iframe>
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'jeffsaracco',
-            count: 0,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-<section>
-  <h1>Latest Tweets</h1>
-  <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  <script type="text/javascript">
-    $.domReady(function(){
-      getTwitterFeed("jsaracco", 4, false);
-    });
-  </script>
-  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
-  
-    <a href="http://twitter.com/jsaracco" class="twitter-follow-button" data-width="208px" data-show-count="false">Follow @jsaracco</a>
-  
-</section>
-
-
-
-<section class="googleplus">
-  <h1>
-    <a href="https://plus.google.com/105546041830906548240?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
-</section>
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2011 - Jeff Saracco -
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'jeffsaracco';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-  <script type="text/javascript">
-    (function() {
-      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
-      script.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-    })();
-  </script>
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>

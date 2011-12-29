@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ASP.NET-MVC,C# | Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/blog/categories/asp-net-mvc-c-/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2011-12-29T04:41:09+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP MVC - Fix for IE caching everything]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/"/>
+    <updated>2011-11-28T18:34:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything</id>
+    <content type="html"><![CDATA[<p>So it turns out that IE aggressively caches every AJAX GET response, which makes for some interesting and hard to fix bugs since we moved a lot of functionality to AJAX calls with MVC.</p>
+
+<p>Fear not, I have found a solution for this. The solution is to put a custom attribute on your MVC GET action if it is being called through AJAX.
+For Instance, the GET method for getting a list may look like this:
+<code>c#
+[CacheControl(HttpCacheability.NoCache), HttpGet]
+public ActionResult MyAction(int param1, int param2)
+</code></p>
+
+<p><code>CacheControl(HttpCacheability.NoCache)</code> is the attribute you should put on your MVC action in order for IE to not cache anything.</p>
+
+<p>If all you want to know is how to fix this bug, you can stop reading here, if you want to know what it is doing, keep going.</p>
+
+<p>The way this works is creating a class that inherits from the ActionFilterAttribute class and overriding the OnActionExecuted method and adding some no-cache information to the headers being sent out.
+Full class below</p>
+
+<p>``` c#
+public class CacheControlAttribute : ActionFilterAttribute
+{</p>
+
+<pre><code>    public CacheControlAttribute(HttpCacheability cacheability)
+    {
+        _cacheability = cacheability;
+    }
+
+    private readonly HttpCacheability _cacheability;
+
+    public override void OnActionExecuted(ActionExecutedContext filterContext)
+    {
+        HttpCachePolicyBase cache = filterContext.HttpContext.Response.Cache;
+        cache.SetCacheability(_cacheability);
+        cache.SetExpires(DateTime.Now);
+        cache.SetAllowResponseInBrowserHistory(false);
+        cache.SetNoServerCaching();
+        cache.SetNoStore();
+
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
