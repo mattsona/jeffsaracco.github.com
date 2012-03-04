@@ -4,7 +4,7 @@
   <title><![CDATA[Jeff Saracco]]></title>
   <link href="http://jeffsaracco.github.com/atom.xml" rel="self"/>
   <link href="http://jeffsaracco.github.com/"/>
-  <updated>2011-12-29T04:41:09+00:00</updated>
+  <updated>2012-03-04T23:02:28+00:00</updated>
   <id>http://jeffsaracco.github.com/</id>
   <author>
     <name><![CDATA[Jeff Saracco]]></name>
@@ -12,6 +12,131 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby on Rails Polymorphic User Model with Devise authentication]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/"/>
+    <updated>2012-03-04T22:48:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model</id>
+    <content type="html"><![CDATA[<p>When modeling my application I have two types of users that have a polymorphic association to the user model. Such as:</p>
+
+<figure class='code'><figcaption><span>My three classes with polymorphic relationships</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:profileable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User_Type_1</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:profileable</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User_Type_2</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:profileable</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The reason I did this, instead of an STI, is because <code>User_Type_1</code> has something like 4 fields and <code>User_Type_2</code> has something like 20 fields and I didn&#8217;t want the user table to have so many fields (yes 24-ish fields is not a lot but I&#8217;d rather not have ~20 fields empty most of the time)</p>
+
+<p>The problem I was facing at this point was I want the sign up form to only be used to sign up users of type <code>User_Type_1</code> but the sign in form to be used to both. (I will have an admin side of the application which will create users of <code>User_Type_2</code>)</p>
+
+<p>I knew I can use the <code>after_sign_in_path_for(resource)</code> override in <code>AppicationController</code> somehow to redirect to the right part of the site on sign in. Something like:</p>
+
+<figure class='code'><figcaption><span>Overriding the Devise after_sign_in_path_for method</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">after_sign_in_path_for</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">current_user</span><span class="o">.</span><span class="n">profileable_type</span>
+</span><span class='line'>    <span class="k">when</span> <span class="s2">&quot;UserType1&quot;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">user_type_1_index_path</span>
+</span><span class='line'>    <span class="k">when</span> <span class="s2">&quot;UserType2&quot;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">user_type_1_index_path</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To achieve what I wanted here I just created a normal form for the <code>User_Type_1</code> with nested attributes for <code>User</code> and had it post to the <code>UserType1Controller</code>:</p>
+
+<figure class='code'><figcaption><span>User sign up form</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='haml'><span class='line'><span class="p">=</span> <span class="n">form_for</span> <span class="ss">:user_type_1</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:first_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:first_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:last_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:last_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:phone_number</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:phone_number</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">fields_for</span> <span class="ss">:user</span> <span class="k">do</span> <span class="o">|</span><span class="n">user_fields</span><span class="o">|</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:email</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">email_field</span> <span class="ss">:email</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:password</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">password_field</span> <span class="ss">:password</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:password_confirmation</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">password_field</span> <span class="ss">:password_confirmation</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">submit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then saved both objects and called the <code>sign_in_and_redirect</code> helper from Devise</p>
+
+<figure class='code'><figcaption><span>saving the user and user_type_1 objects on create</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">UserType1Controller</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">create</span>
+</span><span class='line'>        <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:user</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@user_type_1</span> <span class="o">=</span> <span class="no">UserType1</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:patron</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@user</span><span class="o">.</span><span class="n">profileable</span> <span class="o">=</span> <span class="vi">@user_type_1</span>
+</span><span class='line'>        <span class="vi">@user_type_1</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>        <span class="vi">@user</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>        <span class="n">sign_in_and_redirect</span> <span class="vi">@user</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'> <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then the <code>after_sign_in_path_for</code> method from above sent it to the right place and it was all good.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater]]></title>

@@ -1,0 +1,427 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Ruby on Rails Polymorphic User Model with Devise authentication - Jeff Saracco</title>
+  <meta name="author" content="Jeff Saracco">
+
+  
+  <meta name="description" content="When modeling my application I have two types of users that have a polymorphic association to the user model. Such as: My three classes with &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jeff Saracco" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17462061-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jeff Saracco</a></h1>
+  
+    <h2>random thoughts, ideas, ramblings.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeffsaracco.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Ruby on Rails Polymorphic User Model With Devise Authentication</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-04T22:48:00+00:00" pubdate data-updated="true">Mar 4<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>When modeling my application I have two types of users that have a polymorphic association to the user model. Such as:</p>
+
+<figure class='code'><figcaption><span>My three classes with polymorphic relationships</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">belongs_to</span> <span class="ss">:profileable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User_Type_1</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:profileable</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User_Type_2</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>    <span class="n">has_one</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:profileable</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The reason I did this, instead of an STI, is because <code>User_Type_1</code> has something like 4 fields and <code>User_Type_2</code> has something like 20 fields and I didn&#8217;t want the user table to have so many fields (yes 24-ish fields is not a lot but I&#8217;d rather not have ~20 fields empty most of the time)</p>
+
+<p>The problem I was facing at this point was I want the sign up form to only be used to sign up users of type <code>User_Type_1</code> but the sign in form to be used to both. (I will have an admin side of the application which will create users of <code>User_Type_2</code>)</p>
+
+<p>I knew I can use the <code>after_sign_in_path_for(resource)</code> override in <code>AppicationController</code> somehow to redirect to the right part of the site on sign in. Something like:</p>
+
+<figure class='code'><figcaption><span>Overriding the Devise after_sign_in_path_for method</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">after_sign_in_path_for</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">current_user</span><span class="o">.</span><span class="n">profileable_type</span>
+</span><span class='line'>    <span class="k">when</span> <span class="s2">&quot;UserType1&quot;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">user_type_1_index_path</span>
+</span><span class='line'>    <span class="k">when</span> <span class="s2">&quot;UserType2&quot;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">user_type_1_index_path</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To achieve what I wanted here I just created a normal form for the <code>User_Type_1</code> with nested attributes for <code>User</code> and had it post to the <code>UserType1Controller</code>:</p>
+
+<figure class='code'><figcaption><span>User sign up form</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='haml'><span class='line'><span class="p">=</span> <span class="n">form_for</span> <span class="ss">:user_type_1</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:first_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:first_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:last_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:last_name</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:phone_number</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:phone_number</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">fields_for</span> <span class="ss">:user</span> <span class="k">do</span> <span class="o">|</span><span class="n">user_fields</span><span class="o">|</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:email</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">email_field</span> <span class="ss">:email</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:password</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">password_field</span> <span class="ss">:password</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">label</span> <span class="ss">:password_confirmation</span>
+</span><span class='line'>    <span class="p">=</span> <span class="n">user_fields</span><span class="o">.</span><span class="n">password_field</span> <span class="ss">:password_confirmation</span>
+</span><span class='line'>  <span class="p">=</span> <span class="n">f</span><span class="o">.</span><span class="n">submit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then saved both objects and called the <code>sign_in_and_redirect</code> helper from Devise</p>
+
+<figure class='code'><figcaption><span>saving the user and user_type_1 objects on create</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">UserType1Controller</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">create</span>
+</span><span class='line'>        <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:user</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@user_type_1</span> <span class="o">=</span> <span class="no">UserType1</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:patron</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@user</span><span class="o">.</span><span class="n">profileable</span> <span class="o">=</span> <span class="vi">@user_type_1</span>
+</span><span class='line'>        <span class="vi">@user_type_1</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>        <span class="vi">@user</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>        <span class="n">sign_in_and_redirect</span> <span class="vi">@user</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'> <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then the <code>after_sign_in_path_for</code> method from above sent it to the right place and it was all good.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jeff Saracco</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-04T22:48:00+00:00" pubdate data-updated="true">Mar 4<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/devise/'>Devise</a>, <a class='category' href='/blog/categories/polymorphism/'>Polymorphism</a>, <a class='category' href='/blog/categories/ruby-on-rails/'>Ruby-on-Rails</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/" data-via="jsaracco" data-counturl="http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/" title="Previous Post: ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater">&laquo; ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/">Ruby on Rails Polymorphic User Model with Devise authentication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-dot-net-c-number-catch-the-selectedindexchanged-of-a-dropdownlist-inside-a-repeater/">ASP.NET C# - Catch the SelectedIndexChanged of a DropDownList inside a Repeater</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-mvc-onactionexecuting-redirect-without-executing-action/">ASP MVC OnActionExecuting redirect without executing action</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/dropping-partial-mvc-views-on-old-school-webforms-pages/">Dropping Partial MVC Views on Old School WebForms Pages</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/asp-mvc-fix-for-ie-caching-everything/">ASP MVC - Fix for IE caching everything</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <iframe src="http://githubbadge.appspot.com/badge/jeffsaracco" style="border: 0;height: 150px;width: 200px;overflow: hidden;"></iframe>
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeffsaracco',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jsaracco", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jsaracco" class="twitter-follow-button" data-width="208px" data-show-count="false">Follow @jsaracco</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/105546041830906548240?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jeff Saracco -
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jeffsaracco';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/';
+        var disqus_url = 'http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

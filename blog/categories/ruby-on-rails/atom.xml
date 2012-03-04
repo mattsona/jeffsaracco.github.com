@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ruby-on-Rails | Jeff Saracco]]></title>
+  <link href="http://jeffsaracco.github.com/blog/categories/ruby-on-rails/atom.xml" rel="self"/>
+  <link href="http://jeffsaracco.github.com/"/>
+  <updated>2012-03-04T23:02:28+00:00</updated>
+  <id>http://jeffsaracco.github.com/</id>
+  <author>
+    <name><![CDATA[Jeff Saracco]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby on Rails Polymorphic User Model with Devise authentication]]></title>
+    <link href="http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model/"/>
+    <updated>2012-03-04T22:48:00+00:00</updated>
+    <id>http://jeffsaracco.github.com/blog/2012/03/04/ruby-on-rails-polymorphic-user-model</id>
+    <content type="html"><![CDATA[<p>When modeling my application I have two types of users that have a polymorphic association to the user model. Such as:</p>
+
+<p>``` ruby My three classes with polymorphic relationships
+class User &lt; ActiveRecord::Base</p>
+
+<pre><code>belongs_to :profileable, :polymorphic =&gt; true
+</code></pre>
+
+<p>end</p>
+
+<p>class User_Type_1 &lt; ActiveRecord::Base</p>
+
+<pre><code>has_one :user, :as =&gt; :profileable
+</code></pre>
+
+<p>end</p>
+
+<p>class User_Type_2 &lt; ActiveRecord::Base</p>
+
+<pre><code>has_one :user, :as =&gt; :profileable
+</code></pre>
+
+<p>end
+```</p>
+
+<p>The reason I did this, instead of an STI, is because <code>User_Type_1</code> has something like 4 fields and <code>User_Type_2</code> has something like 20 fields and I didn't want the user table to have so many fields (yes 24-ish fields is not a lot but I'd rather not have ~20 fields empty most of the time)</p>
+
+<p>The problem I was facing at this point was I want the sign up form to only be used to sign up users of type <code>User_Type_1</code> but the sign in form to be used to both. (I will have an admin side of the application which will create users of <code>User_Type_2</code>)</p>
+
+<p>I knew I can use the <code>after_sign_in_path_for(resource)</code> override in <code>AppicationController</code> somehow to redirect to the right part of the site on sign in. Something like:</p>
+
+<p>``` ruby Overriding the Devise after_sign_in_path_for method
+def after_sign_in_path_for(resource)</p>
+
+<pre><code>case current_user.profileable_type
+when "UserType1"
+    return user_type_1_index_path
+when "UserType2"
+    return user_type_1_index_path
+end
+</code></pre>
+
+<p>end
+```</p>
+
+<p>To achieve what I wanted here I just created a normal form for the <code>User_Type_1</code> with nested attributes for <code>User</code> and had it post to the <code>UserType1Controller</code>:</p>
+
+<p>``` haml User sign up form
+= form_for :user_type_1 do |f|
+  = f.label :first_name
+  = f.text_field :first_name
+  = f.label :last_name
+  = f.text_field :last_name
+  = f.label :phone_number
+  = f.text_field :phone_number
+  = fields_for :user do |user_fields|</p>
+
+<pre><code>= user_fields.label :email
+= user_fields.email_field :email
+= user_fields.label :password
+= user_fields.password_field :password
+= user_fields.label :password_confirmation
+= user_fields.password_field :password_confirmation
+</code></pre>
+
+<p>  = f.submit
+```</p>
+
+<p>Then saved both objects and called the <code>sign_in_and_redirect</code> helper from Devise</p>
+
+<p>``` ruby saving the user and user_type_1 objects on create
+class UserType1Controller &lt; ApplicationController</p>
+
+<pre><code>...
+def create
+    @user = User.new(params[:user])
+    @user_type_1 = UserType1.new(params[:patron])
+    @user.profileable = @user_type_1
+    @user_type_1.save
+    @user.save
+    sign_in_and_redirect @user
+end
+...
+</code></pre>
+
+<p> end
+```</p>
+
+<p>Then the <code>after_sign_in_path_for</code> method from above sent it to the right place and it was all good.</p>
+]]></content>
+  </entry>
+  
+</feed>
